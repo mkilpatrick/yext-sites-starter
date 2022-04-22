@@ -1,10 +1,4 @@
-export type Address = {
-  line1: string;
-  city: string;
-  region: string;
-  postalCode: string;
-  countryCode: string;
-};
+import { Address } from "../types";
 
 type Banner = {
   name?: string;

@@ -17,3 +17,19 @@
 .secondary-cta{
     @apply bg-sky-700 hover:bg-sky-800;
 }
+
+[data-data-track] {
+    border: 1px solid red;
+    position: relative;
+}
+
+[data-data-track]:hover::before {
+    content: attr(data-data-track);
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 7px;
+    padding: 3px;
+    color: white;
+    top: -30px;
+    left: 0;
+}
