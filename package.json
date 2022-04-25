@@ -21,7 +21,7 @@
     "react-dom": "^17.0.2",
     "react-i18next": "^11.16.2",
     "typescript": "^4.6.2",
-    "@yext/yext-sites-scripts": "mkilpatrick/yext-sites-scripts#0482ef34613c4b5366cea719339f3636427c7990",
+    "@yext/yext-sites-scripts": "mkilpatrick/yext-sites-scripts#605e362a7850515b4d0d2e1193e29d9b1b368125",
     "cross-fetch": "^3.1.5"
   },
   "devDependencies": {

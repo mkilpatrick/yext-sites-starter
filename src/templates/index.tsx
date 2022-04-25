@@ -12,6 +12,7 @@ import { renderToString } from 'react-dom/server';
 import '../index.css';
 
 import { Trans, useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 export const config = {
   name: 'index',
@@ -53,14 +54,50 @@ export const getPath = (data: any) => {
   return `index/${data.document.streamOutput.uid.toString()}`;
 };
 
+function makeid(length: number) {
+  var result           = '';
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * 
+charactersLength));
+ }
+ return result;
+}
+
+function makeNumber(length: number) {
+  var result           = '';
+  var characters       = '123456789';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * 
+charactersLength));
+ }
+ return Number(result);
+}
+
+
+function randomize(v: any): any {
+  if (typeof v === 'string') return makeid(12);
+  if (typeof v === 'number') return makeNumber(12);
+  if (Array.isArray(v)) return v.map(randomize)
+  if (typeof v === 'object') return Object.keys(v).reduce((out, key) => ({...out, [key]: key === 'hours' ? v[key] : randomize(v[key])}), {})
+}
+
 const Index = ({ data }: { data: any }) => {
+  const [random, setRandom] = useState(false);
+  console.log("Is randomized?: ", random)
   const { document } = data;
-  const { streamOutput } = document;
+  let { streamOutput } = document;
+  streamOutput = random ? randomize(streamOutput) : streamOutput;
   const { name, address, openTime, hours, mainPhone, _site, geocodedCoordinate, services, photoGallery } = streamOutput;
   const { t, i18n } = useTranslation();
+  console.log("In: ", streamOutput);
+  console.log("random: ", randomize(streamOutput));
 
   return (
     <>
+      <button onClick={() => setRandom(true)}>Use Random</button>
       <div className="centered-container">
         <Header
           logo="https://cdn.fs.brandfolder.com/cache=expiry:604800/deY3VGFpSjC761Abjbfc"
