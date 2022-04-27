@@ -6,6 +6,7 @@ import Contact from '../components/contact';
 import List from '../components/list';
 import Hours from '../components/hours';
 import StaticMap from '../components/static-map';
+import { SchemaWrapper } from '../components/schema/jsonld';
 import PhotoGallery from '../components/photo-gallery';
 import { reactWrapper } from '../wrapper';
 import { renderToString } from 'react-dom/server';
@@ -100,6 +101,6 @@ const Index = ({ data }: { data: any }) => {
 };
 
 export const render = (data: any) =>
-  reactWrapper(data, 'index', 'index.tsx', renderToString(<Index data={data} />), config.hydrate);
+  reactWrapper(data, 'index', 'index.tsx', renderToString(<Index data={data} />), config.hydrate, SchemaWrapper(data));
 
 export default Index;

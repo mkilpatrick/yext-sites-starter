@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import { reactWrapper } from '../wrapper';
+import { SchemaWrapper } from '../components/schema/jsonld';
 
 export const config = {
   name: 'Product Test',
@@ -41,6 +42,6 @@ const Test = (props: any) => {
 };
 
 export const render = (data: any) =>
-  reactWrapper(data, 'Product Test', 'test.tsx', renderToString(<Test data={data} />), true);
+  reactWrapper(data, 'Product Test', 'test.tsx', renderToString(<Test data={data} />), true, SchemaWrapper(data));
 
 export default Test;
