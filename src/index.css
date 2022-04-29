@@ -17,3 +17,22 @@
 .secondary-cta{
     @apply bg-sky-700 hover:bg-sky-800;
 }
+
+.CFD-tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+.CFD-section {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+}
+
+.CFD-usage {
+    font-size: 10px;
+}

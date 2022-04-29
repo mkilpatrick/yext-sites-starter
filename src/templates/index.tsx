@@ -75,6 +75,7 @@ const Index = ({ data }: { data: any }) => {
           <Cta buttonText="Get Directions" url="http://google.com" style="primary-cta" />
         </div>
       </Banner>
+      <a className="link1" href={_site.c_header[0].uRL}>{_site.c_header[0].label}</a>
       <div className="centered-container">
         <div className="section">
           <div className="grid grid-cols-3 gap-x-10 gap-y-10">
