@@ -12,6 +12,8 @@ import { renderToString } from 'react-dom/server';
 import '../index.css';
 
 import { Trans, useTranslation } from 'react-i18next';
+import ClickableThing from '../components/clickableThing';
+import TabbableThing from '../components/tabbableThing';
 
 export const config = {
   name: 'index',
@@ -76,6 +78,8 @@ const Index = ({ data }: { data: any }) => {
         </div>
       </Banner>
       <a className="link1" href={_site.c_header[0].uRL}>{_site.c_header[0].label}</a>
+      <ClickableThing name={name} />
+      <TabbableThing tab1={name} tab2={address.line1} />
       <div className="centered-container">
         <div className="section">
           <div className="grid grid-cols-3 gap-x-10 gap-y-10">
