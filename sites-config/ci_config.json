@@ -41,7 +41,7 @@
     ]
   },
   "buildArtifacts": {
-    "buildCmd": "npm run directbuild"
+    "buildCmd": "npm run cibuild"
   },
   "livePreview": {
     "serveSetupCmd": ":"
