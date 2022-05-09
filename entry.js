@@ -71,6 +71,13 @@ const hydrate = async () => {
           }),
           container);
         }
+
+        // Set up the profile proxy
+        const proxyProfile = module.getProxyProfile(window._RSS_PROPS_.data.document.streamOutput);
+        // Save a non-proxied version of the props so the CF Debugger doesn't trigger itself
+        window._RSS_PROPS_NOPROXY_ = structuredClone(window._RSS_PROPS_);
+        window._RSS_PROPS_.data.document.streamOutput = proxyProfile;
+
         module.initCFDebugger(rerender);
       });
   }

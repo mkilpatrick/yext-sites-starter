@@ -58,7 +58,7 @@ export const getPath = (data: any) => {
 const Index = ({ data }: { data: any }) => {
   const { document } = data;
   const { streamOutput } = document;
-  const { name, address, openTime, hours, mainPhone, _site, geocodedCoordinate, services, photoGallery } = streamOutput;
+  const { name, address, openTime, hours, mainPhone, _site, geocodedCoordinate, services, photoGallery, locale, id } = streamOutput;
   const { t, i18n } = useTranslation();
 
   return (
@@ -71,9 +71,11 @@ const Index = ({ data }: { data: any }) => {
       </div>
       <Banner name={name} address={address} openTime={openTime}>
         <div className="bg-white h-40 w-1/5 flex items-center justify-center text-center flex-col space-y-4 rounded-lg">
-          <div className="text-black text-base">Visit Us Today!</div>
-          <div className="text-black text-base"><Trans>hello world</Trans></div>
-          <div className="text-black text-base">{t('hello world')}</div>
+          <div className="text-black text-base">
+            {locale === 'en' ? 'Visit Us Today!' : 'Locale is not EN'}
+          </div>
+          {/* <div className="text-black text-base"><Trans>hello world</Trans></div>
+          <div className="text-black text-base">{t('hello world')}</div> */}
           <Cta buttonText="Get Directions" url="http://google.com" style="primary-cta" />
         </div>
       </Banner>

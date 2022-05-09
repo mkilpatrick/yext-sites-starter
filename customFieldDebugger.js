@@ -116,12 +116,12 @@ function enableWatchDOMForChanges(rerender) {
       // If we try to clone the DOM & render in virtual DOM, the State is reset to default values.
       //  This breaks in the case where the State is causing DOM elements to be hidden/shown, like
       //  for example the FAQ component expand/collapse.
-      const [fakeProps, flatProps] = generateRandomizedProps(window._RSS_PROPS_);
+      const [fakeProps, flatProps] = generateRandomizedProps(window._RSS_PROPS_NOPROXY_);
       rerender(fakeProps); // <- this visibly updates the page (its the only way to preserve the existing State?)
       const usageList = findFieldValueUsages(flatProps, document.body);
 
       // Fix the visible page by re-rendering with the real data
-      rerender(window._RSS_PROPS_);
+      rerender(window._RSS_PROPS_NOPROXY_);
 
       // And re-enable all of the CFDebugger features
       addDataAttributeTags(usageList, document.body);
@@ -223,7 +223,7 @@ function addDataAttributeTags(usageList, targetDOM) {
 
 function initCFDebugger(renderFunction) {
   // Render the initial state of the page with random props in a Virtual DOM
-  const [fakeProps, flatProps] = generateRandomizedProps(window._RSS_PROPS_);
+  const [fakeProps, flatProps] = generateRandomizedProps(window._RSS_PROPS_NOPROXY_);
   const VDOM = document.cloneNode(true);
   renderFunction(fakeProps, VDOM.querySelector('#root'));
 
@@ -278,7 +278,7 @@ function enableTooltipVisualization() {
 }
 
 function enableUsageVisualization() {
-  const flatProfile = flattenObj(window._RSS_PROPS_.data.document.streamOutput);
+  const flatProfile = flattenObj(window._RSS_PROPS_NOPROXY_.data.document.streamOutput);
 
   const cfEls = document.querySelectorAll('[data-cfd-tooltip]');
   const usageMap = {};
@@ -325,21 +325,40 @@ function enableUsageVisualization() {
   }
 
   Object.entries(flatProfile).forEach(([key, val]) => {
-    // If the prop is used on the page, it will be in 'usageMap'
+    // If the custom field is rendered on the page, it will be in 'usageMap'
     if (usageMap[key]) {
       let usageDiv = document.createElement('div');
       usageDiv.classList.add('CFDUsagePanel-field', 'CFDUsagePanel-field--used');
-      usageDiv.innerHTML = `<span class="CFDUsagePanel-fieldStatus">In Use</span>${buildFieldSummaryHTML(key, val)}`;
+      usageDiv.innerHTML = `
+        <span class="CFDUsagePanel-fieldStatusIndicator CFDUsagePanel-fieldStatusIndicator--used"></span>
+        <span class="CFDUsagePanel-fieldStatus">On Page</span>
+        ${buildFieldSummaryHTML(key, val)}
+      `;
       usageDiv.addEventListener('click', () => {
         document.querySelectorAll('.CFD-isSelected').forEach(el => el.classList.remove('CFD-isSelected'));
         usageMap[key][0].classList.add('CFD-isSelected');
         window.scrollTo({top: usageMap[key][0].scrollTop, behavior: 'smooth'});
       });
       usagePanelScrollableEl.appendChild(usageDiv);
+    
+    // If the custom field is used but not rendered on the page, it will be in `window.cfdProxyUsage`
+    } else if (window.cfdProxyUsage[key]) {
+      let usageDiv = document.createElement('div');
+      usageDiv.classList.add('CFDUsagePanel-field', 'CFDUsagePanel-field--used');
+      usageDiv.innerHTML = `
+        <span class="CFDUsagePanel-fieldStatusIndicator CFDUsagePanel-fieldStatusIndicator--internal"></span>
+        <span class="CFDUsagePanel-fieldStatus">Internal Logic</span>
+        ${buildFieldSummaryHTML(key, val)}
+      `;
+      usagePanelScrollableEl.appendChild(usageDiv);
     } else {
       let usageDiv = document.createElement('div');
       usageDiv.classList.add('CFDUsagePanel-field', 'CFDUsagePanel-field--notUsed');
-      usageDiv.innerHTML = `<span class="CFDUsagePanel-fieldStatus">Not Used</span>${buildFieldSummaryHTML(key, val)}`;
+      usageDiv.innerHTML = `
+        <span class="CFDUsagePanel-fieldStatusIndicator CFDUsagePanel-fieldStatusIndicator--notUsed"></span>
+        <span class="CFDUsagePanel-fieldStatus">Not Used</span>
+        ${buildFieldSummaryHTML(key, val)}
+      `;
       usagePanelScrollableEl.appendChild(usageDiv);
     }
   });
@@ -355,6 +374,34 @@ function enableUsageVisualization() {
   document.body.appendChild(usagePanelEl);
 }
 
+function getProxyProfile(profile) {
+  window.cfdProxyUsage = window.cfdProxyUsage || {};
+
+  function buildHandler(parentPath='') {
+    return {
+      get(target, prop, receiver) {
+        if (prop in target) {
+          // Don't log accesses to object or function types (Custom fields can't be those)
+
+          // For objects, we need to create a new Proxy for the child object
+          if (typeof target[prop] === 'object') {
+            return new Proxy(target[prop], buildHandler(`${parentPath}${prop}.`));
+          } else if (typeof target[prop] === 'function') {
+            return target[prop];
+          } else {
+            window.cfdProxyUsage[`${parentPath}${prop}`] = true;
+          }
+        }
+
+        return target[prop];
+      }
+    }
+  }
+
+  return new Proxy(profile, buildHandler());
+}
+
 export {
   initCFDebugger,
+  getProxyProfile,
 }
