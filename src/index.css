@@ -17,3 +17,211 @@
 .secondary-cta{
     @apply bg-sky-700 hover:bg-sky-800;
 }
+
+[data-cfd-tooltip] {
+    outline: 2px solid red;
+}
+
+.CFD-tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+.CFD-section {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+}
+
+.CFD-usage {
+    font-size: 10px;
+}
+
+.CFDUsagePanel {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) translateX(100%);
+    background-color: rgb(22, 22, 22);
+    padding: 16px 0;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    font-size: 14px;
+    color: #fff;
+    transition: transform 0.5s ease;
+}
+
+.CFDUsagePanel.is-visible {
+    transform: translateY(-50%) translateX(0);
+}
+
+.CFDUsagePanel.is-visible .CFD-usageBtn::after {
+    border-right: 8px solid transparent;
+    border-left: 8px solid #fff;
+    transform: translate(-25%, -50%);
+}
+
+.CFDUsagePanel-scrollable {
+    height: 600px;
+    overflow-y: auto;
+}
+
+.CFD-usageBtn {
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 60px;
+    background-color: rgb(22, 22, 22);
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.CFD-usageBtn::after {
+    content: '';
+    border: 8px solid transparent;
+    border-right: 8px solid #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-75%, -50%);
+}
+
+.CFDUsagePanel-headingRow {
+    padding: 4px 16px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #fff;
+}
+
+.CFDUsagePanel-headingSortButton {
+    display: flex;
+    position: relative;
+    left: 4px;
+    padding: 8px;
+}
+
+.CFDUsagePanel-headingSortIcon {
+    position: relative;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: #6b6b6b;
+    border: 2px solid #000;
+}
+
+.CFDUsagePanel-headingSortIcon::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    transform: translateX(-50%);
+    border-bottom: 8px solid #6b6b6b;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    z-index: -1;
+}
+
+.CFDUsagePanel-headingSortIcon::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    transform: translateX(-50%);
+    border-top: 8px solid #6b6b6b;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    z-index: -1;
+}
+
+.CFDUsagePanel-headingSortIcon.is-sorted {
+    background-color: #fff;
+}
+
+.CFDUsagePanel-headingSortIcon.is-ascending::before {
+    border-bottom-color: #fff;
+}
+
+.CFDUsagePanel-headingSortIcon.is-descending::after {
+    border-top-color: #fff;
+}
+
+.CFDUsagePanel-headingRow .CFDUsagePanel-heading {
+    font-size: 16px;
+    font-weight: 700;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.CFDUsagePanel-heading.CFDUsagePanel-fieldStatus {
+    margin-right: 14px;
+}
+
+.CFDUsagePanel-field {
+    padding: 4px 16px;
+    display: flex;
+    align-items: center;
+}
+
+.CFDUsagePanel-field:nth-child(2n) {
+    background-color: rgb(44, 44, 44);
+}
+
+.CFDUsagePanel-fieldSummary {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.CFDUsagePanel-fieldSummaryKey {
+    font-weight: 600;
+}
+
+.CFDUsagePanel-fieldSummaryVal {
+    font-size: 12px;
+    padding-left: 12px;
+}
+
+.CFDUsagePanel-fieldStatusIndicator {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.CFDUsagePanel-fieldStatusIndicator--used {
+    background-color: palegreen;
+}
+
+.CFDUsagePanel-fieldStatusIndicator--internal {
+    background-color: gold;
+}
+
+.CFDUsagePanel-fieldStatusIndicator--notUsed {
+    background-color: #8b8b8b;
+}
+
+.CFDUsagePanel-fieldStatus {
+    width: 80px;
+    font-size: 11px;
+    display: inline-block;
+}
+
+.CFDUsagePanel-field--notUsed {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.CFDUsagePanel-field--notUsed .CFDUsagePanel-fieldStatus {
+    font-style: italic;
+}
+
+.CFDUsagePanel-field--used:hover {
+    cursor: pointer;
+}
+
+.CFD-isSelected {
+    background-color: palegreen;
+}

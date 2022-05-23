@@ -42,6 +42,7 @@ const hydrate = async () => {
   const templateFilename = window._RSS_TEMPLATE_?.split('.')[0];
 
   const { default: component } = (await routes.find((route) => route.name === templateFilename)?.getComponent()) || {};
+
   ReactDOM.hydrate(
     _jsx(App, {
       page: {
@@ -54,6 +55,34 @@ const hydrate = async () => {
     }),
     document.getElementById('root'),
   );
+
+  window.enableCFDebugger = function() {
+    import ('./customFieldDebugger.js')
+      .then(module => {
+        function rerender(props, container=document.getElementById('root')) {
+          ReactDOM.render(_jsx(App, {
+            page: {
+              props: props,
+              path: window.location.pathname,
+              component: component,
+            },
+            translations: window._RSS_I18N_,
+            locale: window._RSS_LOCALE_,
+          }),
+          container);
+        }
+
+        // Set up the profile proxy
+        const proxyProfile = module.getProxyProfile(window._RSS_PROPS_.data.document.streamOutput);
+        // Save a non-proxied version of the props so the CF Debugger doesn't trigger itself
+        window._RSS_PROPS_NOPROXY_ = structuredClone(window._RSS_PROPS_);
+        window._RSS_PROPS_.data.document.streamOutput = proxyProfile;
+
+        module.initCFDebugger(rerender);
+      });
+  }
+
+  window.enableCFDebugger();
 };
 //@ts-ignore
 if (!import.meta.env.SSR) hydrate();
