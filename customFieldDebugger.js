@@ -1,21 +1,23 @@
+import UsagePanel from './src/components/customFieldDebugger/usagePanel';
+import ReactDOM from 'react-dom';
+import { jsx as _jsx } from 'react/jsx-runtime';
+
 function makeid(length) {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * 
-charactersLength));
+  let result           = '';
+  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
+  for ( let i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 }
 
 function makeNumber(length) {
-  var result           = '';
-  var characters       = '123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * 
-charactersLength));
+  let result           = '';
+  let characters       = '123456789';
+  let charactersLength = characters.length;
+  for ( let i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return Number(result);
 }
@@ -146,8 +148,8 @@ function disableAndCleanupCFDebugger() {
     });
   });
 
-  document.querySelectorAll('CFD-tooltip').forEach(el => el.remove());
-  document.querySelectorAll('CFD-usagePanel').forEach(el => el.remove());
+  document.querySelectorAll('.CFD-tooltip').forEach(el => el.remove());
+  document.querySelectorAll('.CFD-usagePanel').forEach(el => el.remove());
 }
 
 // Returns Array of two items:
@@ -173,7 +175,7 @@ function findFieldValueUsages(fieldValues, sourceDOM) {
     const nodeIterator = document.createNodeIterator(sourceDOM, NodeFilter.SHOW_ALL, node => {
       // The fieldValue could be textContent for a node
       if (node.nodeType === Node.TEXT_NODE && node.textContent.includes(fieldValue)) {
-        node.cfdUsage = 'textContent';
+        node.cfdUsage = 'Text Content';
         return NodeFilter.FILTER_ACCEPT;
 
       // The fieldValue could be an attribute on a node
@@ -181,7 +183,7 @@ function findFieldValueUsages(fieldValues, sourceDOM) {
         const attrs = node.getAttributeNames();
         for (const attrName of attrs) {
           if (node.getAttribute(attrName) === fieldValue) {
-            node.cfdUsage = `attribute_${attrName}`;
+            node.cfdUsage = `Attribute: ${attrName}`;
             return NodeFilter.FILTER_ACCEPT;
           }
         }
@@ -297,81 +299,16 @@ function enableUsageVisualization() {
     });
   });
 
-  let usagePanelEl = document.createElement('div');
-  usagePanelEl.classList.add('CFD-usagePanel', 'CFDUsagePanel');
-  let usagePanelScrollableEl = document.createElement('div');
-  usagePanelScrollableEl.classList.add('CFDUsagePanel-scrollable');
-  usagePanelEl.appendChild(usagePanelScrollableEl);
+  // Add a container element to the DOM to render a react element into
+  let usagePanelContainerEl = document.createElement('div');
+  usagePanelContainerEl.id = 'usagePanelContainer';
+  document.body.appendChild(usagePanelContainerEl);
 
-
-  function buildFieldSummaryHTML(key, val) {
-    let shortKey = key;
-    const prefix = 'document.streamOutput.';
-    if (shortKey.startsWith(prefix)) {
-      shortKey = shortKey.slice(prefix.length);
-    }
-
-    let shortVal = val;
-    const maxStrLen = 40;
-    if (typeof shortVal === 'string' && shortVal.length > maxStrLen) {
-      shortVal = `${shortVal.slice(0, maxStrLen)}...`;
-    }
-    return `
-      <span class="CFDUsagePanel-fieldSummary">
-        <span class="CFDUsagePanel-fieldSummaryKey">${shortKey}</span>
-        <span class="CFDUsagePanel-fieldSummaryVal">${shortVal}</span>
-      </span>
-    `;
-  }
-
-  Object.entries(flatProfile).forEach(([key, val]) => {
-    // If the custom field is rendered on the page, it will be in 'usageMap'
-    if (usageMap[key]) {
-      let usageDiv = document.createElement('div');
-      usageDiv.classList.add('CFDUsagePanel-field', 'CFDUsagePanel-field--used');
-      usageDiv.innerHTML = `
-        <span class="CFDUsagePanel-fieldStatusIndicator CFDUsagePanel-fieldStatusIndicator--used"></span>
-        <span class="CFDUsagePanel-fieldStatus">On Page</span>
-        ${buildFieldSummaryHTML(key, val)}
-      `;
-      usageDiv.addEventListener('click', () => {
-        document.querySelectorAll('.CFD-isSelected').forEach(el => el.classList.remove('CFD-isSelected'));
-        usageMap[key][0].classList.add('CFD-isSelected');
-        window.scrollTo({top: usageMap[key][0].scrollTop, behavior: 'smooth'});
-      });
-      usagePanelScrollableEl.appendChild(usageDiv);
-    
-    // If the custom field is used but not rendered on the page, it will be in `window.cfdProxyUsage`
-    } else if (window.cfdProxyUsage[key]) {
-      let usageDiv = document.createElement('div');
-      usageDiv.classList.add('CFDUsagePanel-field', 'CFDUsagePanel-field--used');
-      usageDiv.innerHTML = `
-        <span class="CFDUsagePanel-fieldStatusIndicator CFDUsagePanel-fieldStatusIndicator--internal"></span>
-        <span class="CFDUsagePanel-fieldStatus">Internal Logic</span>
-        ${buildFieldSummaryHTML(key, val)}
-      `;
-      usagePanelScrollableEl.appendChild(usageDiv);
-    } else {
-      let usageDiv = document.createElement('div');
-      usageDiv.classList.add('CFDUsagePanel-field', 'CFDUsagePanel-field--notUsed');
-      usageDiv.innerHTML = `
-        <span class="CFDUsagePanel-fieldStatusIndicator CFDUsagePanel-fieldStatusIndicator--notUsed"></span>
-        <span class="CFDUsagePanel-fieldStatus">Not Used</span>
-        ${buildFieldSummaryHTML(key, val)}
-      `;
-      usagePanelScrollableEl.appendChild(usageDiv);
-    }
-  });
-
-  // Add a button to expand/collapse the UsagePanel
-  const btn = document.createElement('button');
-  btn.classList.add('CFD-usageBtn');
-  btn.addEventListener('click', () => {
-    usagePanelEl.classList.toggle('is-visible');
-  });
-  usagePanelEl.appendChild(btn);
-
-  document.body.appendChild(usagePanelEl);
+  ReactDOM.render(_jsx(UsagePanel, {
+    fields: flatProfile,
+    usageMap: usageMap,
+    proxyUsageList: window.cfdProxyUsage,
+  }), usagePanelContainerEl);
 }
 
 function getProxyProfile(profile) {
@@ -382,7 +319,6 @@ function getProxyProfile(profile) {
       get(target, prop, receiver) {
         if (prop in target) {
           // Don't log accesses to object or function types (Custom fields can't be those)
-
           // For objects, we need to create a new Proxy for the child object
           if (typeof target[prop] === 'object') {
             return new Proxy(target[prop], buildHandler(`${parentPath}${prop}.`));
